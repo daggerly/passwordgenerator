@@ -50,25 +50,28 @@ class PasswordGenerator(object):
         """
         return self.product(letters, repeat=length)
 
-    def product_birthday(self, start_date='19700101', end_date=None):
+    def product_date(self, start_date, end_date):
         d = start_date = datetime.strptime(start_date, '%Y%m%d').date()
-        if end_date:
-            end_date = datetime.strptime(end_date, '%Y%m%d').date()
+        end_date = datetime.strptime(end_date, '%Y%m%d').date()
+        day1 = timedelta(days=1)
+        while d<=end_date:
+            yield d
+            d += day1
+
+    def product_birthday(self, start_date='19700101', end_date=None, century=1):
+        if century:
+            output_format = '%Y%m%d'
         else:
-            end_date = date.today() 
-        day1 = timedelta(days=1)
-        while d<=end_date:
-            yield d.strftime('%Y%m%d')
-            d += day1
+            output_format = '%y%m%d'
+        if not end_date:
+            end_date = date.today().strftime('%Y%m%d')
+        for d in self.product_date(start_date, end_date):
+            yield d.strftime(output_format)
         
-    def product_date(self):
+    def product_month_day(self):
         # choose 2000 for there is 20000229
-        d = date(2000,1,1)
-        end_date = date(2000,12,31)
-        day1 = timedelta(days=1)
-        while d<=end_date:
+        for d in self.product_date('20000101', '20001231'):
             yield d.strftime('%m%d')
-            d += day1
 
     def product_chinesename_shortcut(self):        
         name_alphabet = ALPHABET.replace('u', '').replace('U', '')\
